@@ -1,0 +1,36 @@
+#!/bin/bash
+
+USAGE()
+{
+    echo
+    echo USAGE:
+    echo
+    echo "        `basename $0` [-c|-colons|-nc|--nocolons|--help]"
+    echo
+    echo -nc or --nocolons: Suppress colons displayed in the HHMMSS field "(default)"
+    echo -c or --colons:    Include colons in the HHMMSS field
+    echo
+    exit
+}
+
+[ $# -ne 0 ] && {
+    case $1 in
+       h|-h|--h|help|-help|--help)
+           USAGE
+           ;;
+       c|-c|--c|colon*|-colon*|--colon*)
+           date +%Y-%m%d-%T
+           ;;
+       nc|-nc|--nc|ncolon*|-ncolon*|--ncolon*|nocolon*|-nocolon*|--nocolon*)
+           date +%Y-%m%d-%H%M%S
+           ;;
+       *)
+           echo
+           echo "ERROR: Unsupported command line option(s): $*"
+           USAGE
+           ;;
+    esac
+} || {
+    # Default is no colons
+    date +%Y-%m%d-%H%M%S
+}

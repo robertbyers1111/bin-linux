@@ -1,0 +1,43 @@
+#!/bin/sh
+
+#-- Launches a program (specified on the command line) in a screen window, with logging enabled
+
+if [ $# -ne 1 ]; then
+  echo "USAGE: `basename $0` scriptname"
+  exit
+fi
+
+SCRIPT=$1
+LOGDIR=qw_${SCRIPT}
+
+if [ ! -f $SCRIPT ]; then
+  echo $SCRIPT does not exist
+  exit
+fi
+
+if [ ! -x $SCRIPT ]; then
+  echo $SCRIPT not executable
+  exit
+fi
+
+if [ ! -d $LOGDIR ]; then
+  mkdir $LOGDIR
+fi
+
+BASE=`basename $SCRIPT`
+BASE=`echo $BASE | sed 's/\.sh$//'`
+echo BASE:$BASE
+
+NOW=`date +%y%m%d_%H%M%S_%N`
+NOW=`echo $NOW | sed 's/......$//'`
+echo NOW:$NOW
+
+RCFILE=$LOGDIR/.screenrc_${NOW}____${BASE}
+echo RCFILE:$RCFILE
+
+cat $HOME/.screenrc > $RCFILE
+echo logfile $LOGDIR/${NOW}____${BASE}.log >> $RCFILE
+
+cat $RCFILE
+
+screen -S ${NOW}____${BASE} -t ${NOW}____${BASE} -L -c $RCFILE $SCRIPT

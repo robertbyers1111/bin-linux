@@ -1,0 +1,36 @@
+#!/bin/sh
+
+doit_tshark ()
+{
+  echo "tshark -nqr $2 $3"
+  echo "" >> $OUTF
+
+  tshark -nqr $2 $3 |\
+   egrep -v "^Filter:|==========================================" |\
+   sed 's/\(.* Conversations.*\)/===| \1 |===========================/' |\
+   sed 's/\(.*Protocol Hierarchy Statistics.*\)/===| \1 |===========================/' >> $OUTF
+}
+
+doit ()
+{
+  INF=$1
+  OUTF=PCAPSUM.${INF}.txt
+
+  echo "Sending pcap summaries to $OUTF"
+  echo "" > $OUTF
+  echo "=== `date` ===" >> $OUTF
+
+  mycapinfos $INF >> $OUTF
+
+  doit_tshark TCP $INF -zconv,tcp
+  doit_tshark UDP $INF -zconv,udp
+  doit_tshark IP $INF -zconv,ip
+  doit_tshark Ethernet $INF -zconv,eth
+  doit_tshark Protocols $INF -zio,phs
+}
+
+for VAR in $*
+do
+  doit $VAR
+done
+

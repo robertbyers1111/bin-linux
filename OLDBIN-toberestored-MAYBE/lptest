@@ -1,0 +1,39 @@
+#!/bin/bash
+
+#-- This is my rather lame implementation of the old 'lptest' utility (because
+#-- it is not always installed on various systems I use).
+#--
+#-- It doesn't behave exactly like lptest. For example, my version displays
+#-- RANDOM strings, not a fixed pattern.
+#--
+#-- Another difference is my implementation is SLOW and not appropriate for
+#-- generating a LARGE amount of data.
+
+charset="_A-Za-z0-9!@#%^+-=:,"
+
+case $# in
+
+   2) cols=$1
+      rows=$2
+      ;;
+
+   1) cols=$1
+      rows=44
+      ;;
+
+   0) cols=88
+      rows=44
+      ;;
+
+   *) echo ""
+      echo "USAGE: `basename $0` [cols [rows]]"
+      echo ""
+      exit
+      ;;
+esac
+
+while [ $rows -gt 0 ]; do
+    < /dev/urandom tr -dc $charset | head -c$cols ; echo
+    rows=`expr $rows - 1`
+done
+

@@ -1,0 +1,192 @@
+#!/bin/sh
+
+    TESTFILE=/tmp/nonsense
+
+    if [ -f $TESTFILE -o -d $TESTFILE ]; then
+      echo $TESTFILE exists
+    else
+      echo $TESTFILE does NOT exist
+    fi
+
+#-----------------------------------------------------------------------
+#-- Testing exit status (if/then/else)
+
+    if gzip $TESTFILE ; then
+      echo OK: $?
+    else
+      echo FAILED: $?
+    fi
+
+#-----------------------------------------------------------------------
+#-- Testing exit status ('[]')
+
+    gzip $TESTFILE
+    [ $? ] && echo OK: $? || { echo FAILED: $? ; exit; }
+
+#-----------------------------------------------------------------------
+#-- Prevent error if VAR is undefined
+
+    if [ x$VAR = x ]; then
+      echo Ooops VAR undefined
+    fi
+
+#-----------------------------------------------------------------------
+#-- SPACES ARE REQUIRED AROUND '=', '{', and '}'
+
+    FIRST=1
+    for FILE in * ; do
+      if [ "$FIRST" = 1 ]; then
+        FIRST=0
+        echo SKIPPING: $FILE
+      else
+        echo PROCESSING: $FILE
+      fi
+    done
+
+#-----------------------------------------------------------------------
+
+    if [ ! -f $TESTFILE ]; then
+      echo $TESTFILE does not exist
+    elif [ -x $TESTFILE ]; then
+      echo $TESTFILE exists, and is executable
+    else
+      echo $TESTFILE exists, but is not executable
+    fi
+
+#-----------------------------------------------------------------------
+
+   if [[ $VAR == . || "$VAR" == "/home/$LOGNAME/bin"* ]]; then
+     echo Yay!
+   fi
+
+#-----------------------------------------------------------------------
+#-- grep output of a command
+
+  ABC=XX.abc-def.XX
+
+  if echo $ABC | grep abc-def > /dev/null ; then
+    echo "YES: '$ABC' contains         '$SEARCH'"
+  else
+    echo " NO: '$ABC' does not contain '$SEARCH'"
+  fi
+
+#-----------------------------------------------------------------------
+#-- grep output of a command, including grep of its stderr
+
+    alias abc=xyz
+
+    if ( alias abc 2>&1 ) | grep not > /dev/null ; then
+      echo " NO: alias not set for abc"
+    else
+      echo "YES: alias is set for abc"
+    fi
+
+    if ( alias xyz 2>&1 ) | grep not > /dev/null ; then
+      echo " NO: alias not set for xyz"
+    else
+      echo "YES: alias is set for xyz"
+    fi
+
+#-----------------------------------------------------------------------
+#-- []
+
+    [ -f $TMPF ] && rm $TMPF
+
+    [ ! -f JUNK.dat ] && { echo JUNK.dat NOT EXIST; exit; }
+
+    [ -f JUNK.dat ] && echo JUNK.dat exists || { echo JUNK.dat NOT EXIST; exit; }
+
+#-----------------------------------------------------------------------
+#-- [] Doesn't support unary operators, but when 1 arg is passed it
+#-- checks if it is null. Hence we can *sort of* do a unary test..
+
+    tty -s; [[ $? -eq 0 ]] && VERBOSE=1 || VERBOSE=
+    [ $VERBOSE ] && echo Not in cron || echo in cron
+
+#-----------------------------------------------------------------------
+#-- [[]] does not expand paths ('~') nor wildcards ('*'). Hence..
+
+    [[ $filename = *.png ]] && echo "$filename is a PNG file"
+
+#-----------------------------------------------------------------------
+#-- Check if var is defined..
+
+    [ "X${USER}" = "X" ] && echo Uh oh, USER not defined || echo OK, USER is $USER
+
+#-----------------------------------------------------------------------
+#-- Check multiple conditions..
+
+    [ x$1 = x-v ] || [ x$1 = x--verbose ] && { VFLAG=1; shift; }
+
+#-----------------------------------------------------------------------
+# WHY '[ $VALUE ]' DOESN'T WORK THE WAY I WANT.. 
+#
+# test and [ evaluate conditional expressions using a set of rules based on the number of arguments..
+#
+# 0 arguments   The expression is false.
+#
+# 1 argument    The expression is true if and only if the argument is *NOT NULL* <=============== !!!!
+#
+# 2 arguments
+#        If the first argument is !, the expression is true if and only if the second argument is null.  If the first argument is
+#        one  of  the unary conditional operators listed above under CONDITIONAL EXPRESSIONS, the expression is true if the unary
+#        test is true.  If the first argument is not a valid unary conditional operator, the expression is false.
+#
+# 3 arguments
+#        The following conditions are applied in the order listed.  If the second argument is one of the binary conditional oper‐
+#        ators  listed  above  under CONDITIONAL EXPRESSIONS, the result of the expression is the result of the binary test using
+#        the first and third arguments as operands.  The -a and -o operators are considered binary operators when there are three
+#        arguments.   If  the  first argument is !, the value is the negation of the two-argument test using the second and third
+#        arguments.  If the first argument is exactly ( and the third argument is exactly ), the result is the one-argument  test
+#        of the second argument.  Otherwise, the expression is false.
+#
+# 4 arguments
+#        If  the first argument is !, the result is the negation of the three-argument expression composed of the remaining argu‐
+#        ments.  Otherwise, the expression is parsed and evaluated according to precedence using the rules listed above.
+#
+# 5 or more arguments
+#        The expression is parsed and evaluated according to precedence using the rules listed above.
+#
+
+#-----------------------------------------------------------------------
+# Bourne Shell 'if' statements
+#
+#   -eq,-ne  ALGEBRAIC comparisons
+#   =,!=     STRING comparisons - USE SPACES AROUND OPERATOR !!
+#   -o       OR
+#   -a       AND
+#   !        NOT
+#
+# When used with test or [, the < and > operators sort lexicographically using ASCII ordering.
+
+#-----------------------------------------------------------------------
+# -a file         file exists
+# -b file         file exists and is a block special file
+# -c file         file exists and is a character special file
+# -d file         file exists and is a directory
+# -e file         file exists
+# -f file         file exists and is a regular file
+# -G file         file exists and is owned by the effective group id
+# -g file         file exists and is set-group-id
+# -h file         file exists and is a symbolic link
+# -k file         file exists and its sticky bit is set
+# -L file         file exists and is a symbolic link
+# -N file         file exists and has been modified since it was last read
+# -n string       length of string is non-zero
+# -O file         file exists and is owned by the effective user id
+# -o optname      shell option optname is enabled
+# -p file         file exists and is a named pipe (FIFO)
+# -r file         file exists and is readable
+# -R varname      shell variable varname is set and is a name reference
+# -s file         file exists and has a size greater than zero
+# -S file         file exists and is a socket
+# -t fd           file descriptor fd is open and refers to a terminal
+# -u file         file exists and its set-user-id bit is set
+# -v varname      shell variable varname is set (has been assigned a value)
+# -w file         file exists and is writable
+# -x file         file exists and is executable
+# -z string       length of string is zero
+# file1 -ef file2 file1 & file2 refer to the same device & inode numbers
+# file1 -nt file2 file1 is newer (modif date) than file2, or f1 exist & f2 not
+# file1 -ot file2 file1 is older than file2, or f2 exist & f1 not
+

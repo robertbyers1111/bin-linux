@@ -1,0 +1,7 @@
+#!/bin/bash
+USAGE() { echo USAGE: `basename $0` decimal_number...; exit; }
+[ $# -lt 1 ] && USAGE
+for NUM in $*
+do
+    echo 0x`dc -e 16o10i${NUM}p`
+done

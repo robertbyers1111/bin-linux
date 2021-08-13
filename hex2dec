@@ -1,0 +1,10 @@
+#!/bin/bash
+USAGE() { echo USAGE: `basename $0` hexadecimal_number...; exit; }
+[ $# -lt 1 ] && USAGE
+for NUM in $*
+do
+    NUMUPP=`echo $NUM | tr [:lower:] [:upper:]`
+    echo $NUMUPP | grep -q 0X
+    [ $? -ne 0 ] && NUMUPP=0X$NUMUPP
+    dc -e 10o16i${NUMUPP}p
+done

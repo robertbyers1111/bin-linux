@@ -1,0 +1,19 @@
+#!/bin/bash
+
+BASENAME=`basename "$0"`
+
+case $BASENAME in
+
+  lsal) ADDLFLAGS=-lLFAGv
+        ;;
+  lstr) ADDLFLAGS=-AlLFtrG
+        ;;
+  lssz) ADDLFLAGS=-AlLFSrG
+        ;;
+     *) echo WTF
+        exit
+        ;;
+esac
+
+/bin/ls --group-directories-first --time-style="+%Y-%m-%d %H:%M:%S" $ADDLFLAGS $* | grep -v ^total
+

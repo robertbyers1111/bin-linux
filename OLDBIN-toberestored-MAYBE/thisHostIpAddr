@@ -1,0 +1,2 @@
+#!/bin/sh
+ifconfig eth0 | grep inet.addr: | sed 's/.*addr://' | sed 's/ .*//'

@@ -1,0 +1,8 @@
+#!/usr/bin/expect
+while { $argc } {
+ if {[catch {puts [format %c [lindex $argv end-[expr $argc-1]]]} msg ]} {
+   puts [lindex $argv end-[expr $argc-1]]
+ }
+ incr argc -1
+}
+

@@ -1,0 +1,5 @@
+#!/bin/bash
+#
+/home/rmbjr60/bin/bkup.sh $*
+gvim -geom=999x999 $*
+/home/rmbjr60/bin/bkup.sh $*

@@ -1,0 +1,47 @@
+#!/bin/sh
+
+[ $# -lt 1 ] && {
+  echo
+  echo "    USAGE: `basename $0` file.."
+  echo
+  exit
+}
+
+#-- New version calls md5sum, sha1sum, sum -r, and sum -s
+
+doit ()
+{
+  while [ $# -ge 1 ]; do
+    if [ ! -f "$1" ]; then
+      echo "  WTF: '$1' NOT EXIST"
+    else
+      # the 'sed' cmds are to remove leading zeros from integers
+      SUM_r=`/usr/bin/sum -r "$1" | sed 's/^[^1-9]*00*\([0-9]\)/ \1/'`
+      SUM_s=`/usr/bin/sum -s "$1" | sed 's/^[^1-9]*00*\([0-9]\)/ \1/'`
+      MD5SUM=`md5sum "$1" | awk '{print $1}'`
+      SHA1SUM=`sha1sum "$1" | awk '{print $1}'`
+      printf "%s %s   %5d %5d %5d %5d   %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s\n" $MD5SUM $SHA1SUM $SUM_r $SUM_s
+    fi
+    shift
+  done
+}
+
+#-- Old version calls only sum -r and sum -s
+
+doit_OLD ()
+{
+  while [ $# -ge 1 ]; do
+    if [ ! -f "$1" ]; then
+      echo "  WTF: '$1' NOT EXIST"
+    else
+      # the 'sed' cmds are to remove leading zeros from integers
+      SUM_r=`/usr/bin/sum -r "$1" | sed 's/^[^1-9]*00*\([0-9]\)/ \1/'`
+      SUM_s=`/usr/bin/sum -s "$1" | sed 's/^[^1-9]*00*\([0-9]\)/ \1/'`
+      printf "   %5d %5d %5d %5d   %s %s %s %s %s %s %s %s %s %s %s %s %s\n" $SUM_r $SUM_s
+    fi
+    shift
+  done
+}
+
+doit "$@" | sort -n
+

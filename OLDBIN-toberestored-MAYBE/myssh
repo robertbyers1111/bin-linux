@@ -1,0 +1,14 @@
+#!/bin/bash
+
+MYBIN=${HOME}/bin
+TERMTITLE=${MYBIN}/UTY_myfixXtermTitle.sh
+
+if [ -f $TERMTITLE ]; then
+ . $TERMTITLE SSH
+fi
+
+${MYBIN}/UTY_myssh.tcl $*
+
+if [ -f $TERMTITLE ]; then
+ . $TERMTITLE
+fi

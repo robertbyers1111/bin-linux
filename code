@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Make sure we're in the correct directory for building cherrytree.
+# If we are, then launch vs code
+
+VSCODE=/usr/bin/code
+
+NEEDS="\
+  -d data/ -a \
+  -d hunspell/ -a \
+  -d icons/ -a \
+  -d src/ -a \
+  -d styles/ -a \
+  -d tests/ \
+"
+
+[ ${NEEDS} ] && $VSCODE .  || printf "\nERROR: `pwd` does not have the expected directories for building cherrytree\nLooking for..\n${NEEDS}\n\n" | sed 's/-d/\n/g' | sed 's/ -a//g'
+

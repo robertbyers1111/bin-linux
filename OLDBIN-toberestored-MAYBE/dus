@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#   +---------+
+#---| NEW WAY |---
+#   +---------+
+
+    du -h --max-depth=1 $* | sort -h
+
+#   +---------+
+#---| OLD WAY |----------------------------
+#   +---------+
+#
+#   TMPF=/tmp/$USER.`date +%y%m%d%H%M%S`
+#   du -h | grep -v "/.*/" > $TMPF
+#   egrep "^[0-9\.]+K" $TMPF | sort -n
+#   egrep "^[0-9\.]+M" $TMPF | sort -n
+#   egrep "^[0-9\.]+G" $TMPF | sort -n
+#   rm $TMPF
+#------------------------------------------

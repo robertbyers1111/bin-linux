@@ -1,0 +1,55 @@
+#!/bin/sh
+
+#-- Launches a bash session in a screen window, with logging enabled and screen name taken
+#-- from the command line of this script
+
+if [ $# -lt 1 -o $# -gt 2 ]; then
+  echo "USAGE: `basename $0` scriptname [command]"
+  exit
+fi
+
+DOLLARONE=`echo $1 | sed 's/^qw_//' | sed 's/\/$//'`
+RCDIR=~/qwerty/`hostname`
+LOGDIR=qw_${DOLLARONE}
+SCREENNAME=$DOLLARONE
+SCRIPT=/bin/bash
+
+if [ $# -eq 2 ]; then
+  SCRIPT=$2
+fi
+
+if [ ! -f $SCRIPT ]; then
+  echo $SCRIPT does not exist
+  exit
+fi
+
+if [ ! -x $SCRIPT ]; then
+  echo $SCRIPT not executable
+  exit
+fi
+
+if [ ! -d $LOGDIR ]; then
+  mkdir $LOGDIR
+fi
+
+if [ ! -d $RCDIR ]; then
+  mkdir -p $RCDIR
+fi
+
+echo SCREENNAME:$SCREENNAME
+
+NOW=`date +%y%m%d_%H%M%S_%N`
+NOW=`echo $NOW | sed 's/......$//'`
+echo NOW:$NOW
+
+RCFILE=$RCDIR/.screenrc_${SCREENNAME}____${NOW}
+echo RCFILE:$RCFILE
+
+cat /home/rbyers/.screenrc > $RCFILE
+echo logfile $LOGDIR/qw_${SCREENNAME}____${NOW}.log >> $RCFILE
+
+cat $RCFILE
+
+echo screen -S ${SCREENNAME}____${NOW} -t ${SCREENNAME}____${NOW} -L -c $RCFILE $SCRIPT
+screen -S ${SCREENNAME}____${NOW} -t ${SCREENNAME}____${NOW} -L -c $RCFILE $SCRIPT
+

@@ -1,0 +1,72 @@
+#!/bin/sh
+
+doit_MINIMAL_REFORMAT ()
+{
+  echo ""
+  capinfos $1 | sed 's/File name:        /======= File name:/' | egrep -v \
+   "SHA1:|RIPEMD160:|MD5:|Strict time order:|File type:|File encapsulation:|Packet size limit:|Data size:"
+}
+
+doit_REFORMAT ()
+{
+  echo ""
+  capinfos $1 > $TMPCAP
+  head -1 $TMPCAP | sed 's/^/=== /'
+  grep "Number of packets:" $TMPCAP | sed 's/^/ /'
+  grep "Start time:" $TMPCAP | sed 's/^Start time:       /        Start time:/'
+  grep "End time:" $TMPCAP | sed 's/^End time:         /          End time:/'
+  grep "Capture duration:" $TMPCAP | sed 's/^/  /'
+  egrep -v \
+   "File name:|File type:|File encapsulation:|Packet size limit:|Capture duration:|Number of packets:|Start time:|End time:|SHA1:|RIPEMD160:|MD5:|Strict time order:" $TMPCAP |\
+   sed 's/^\(.........: \)/         \1/' |\
+   sed 's/Data byte rate: /    Data byte rate: /' |\
+   sed  's/Data bit rate:   /     Data bit rate: /' |\
+   sed 's/Average packet size: /   Avg packet size: /' |\
+   sed 's/Average packet rate: /   Avg packet rate: /'
+}
+
+#   +------+
+#---| MAIN |---
+#   +------+
+
+if [ $# -lt 1 ]; then
+  echo "USAGE: `basename $0` capturefile ..."
+  exit
+fi
+
+CAPINFOS_VER=`capinfos -h |head -1 |sed 's/[^0-9][^0-9]*\([0-9.][0-9.]*\).*/\1/'`
+CAPINFOS_VER_MAJ=`echo $CAPINFOS_VER | sed 's/\([^.]\).*/\1/'`
+CAPINFOS_VER_MIN=`echo $CAPINFOS_VER | sed 's/.*\.\([^.]\)\..*/\1/'`
+CAPINFOS_VER_BLD=`echo $CAPINFOS_VER | sed 's/.*\..*\.\([^.]\)/\1/'`
+
+MINIMAL_REFORMAT=0
+if [ $CAPINFOS_VER_MAJ -gt 1 ]; then
+  MINIMAL_REFORMAT=1
+elif [ $CAPINFOS_VER_MAJ -eq 1 ]; then
+  if [ $CAPINFOS_VER_MIN -ge 6 ]; then
+    MINIMAL_REFORMAT=1
+  fi
+fi
+
+if [ $MINIMAL_REFORMAT -eq 0 ]; then
+  mkdir -p /tmp/$LOGNAME > /dev/null 2>&1
+  TMPCAP=/tmp/$LOGNAME/mycapinfos.tmp.01
+fi
+
+COUNT=0
+while [ $# -gt 0 ]
+do
+  COUNT=`expr $COUNT + 1`
+  if [ ! -f $1 ]; then
+    echo "ERROR: Ffile $1 does not exist"
+  else
+    case $MINIMAL_REFORMAT in
+      1) doit_MINIMAL_REFORMAT $1
+      ;;
+      *) doit_REFORMAT $1
+      ;;
+    esac
+  fi
+  shift
+done
+

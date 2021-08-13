@@ -1,0 +1,63 @@
+#!/bin/sh
+
+NOW=`date +%y%m%d_%H%M%S`
+NOWSECSHEX=`date +10i16o%sp%Np | dc | sed ':a;N;$!ba;s/\n/./g'`
+TRASH=$HOME/.trash
+SPACE=""
+OPTS=""
+
+[ ! -d $TRASH ] && { echo $TRASH does not exist; exit; }
+
+#-- Check for 'rm -rf'; if so, move the entire directory into trash
+
+if [ "x$1" = "x-rf" ]; then
+  shift
+  echo Detected 'rm -rf', moving everything to ~/.trash/$NOW
+  mv $* ~/.trash/$NOW
+  exit
+fi
+
+#-- Process each command line arg
+
+while [ $# -gt 0 ]; do
+
+  case `echo $1 | cut -c1-1` in
+
+    -) OPTS="$OPTS$SPACE$1"
+       SPACE=" "
+       ;;
+
+    *) FILE="$1"
+       BASENAME=`basename "$FILE"`
+
+       #-- don't bother moving if it is a link
+       if [ -h "$FILE" ]; then
+         #echo /bin/rm $OPTS "$FILE"
+              /bin/rm $OPTS "$FILE"
+
+       else
+
+         #-- Don't do an 'mv' if options are specified
+         if [ x$OPTS != x ]; then
+           #echo /bin/rm $OPTS "$FILE"
+                /bin/rm $OPTS "$FILE"
+
+         #-- if file already exists in trash, give it a unique name before moving
+         elif [ -f "$TRASH/$BASENAME" ]; then
+                MODTIME=`stat -c %y "$FILE" | sed 's/^\(20[01][0-9]\)-\([0-1][0-9]\)-\([0-3][0-9]\) \([0-2][0-9]\):\([0-5][0-9]\):\([0-5][0-9]\).*/\1-\2\3-\4\5/'`
+                mv "$FILE" "$TRASH/$BASENAME.$MODTIME.$NOWSECSHEX"
+
+         #-- Otherwise just move it
+         else
+           #echo mv "$FILE" $TRASH
+                mv "$FILE" $TRASH
+
+         fi
+       fi
+
+  esac
+
+  shift
+
+done
+

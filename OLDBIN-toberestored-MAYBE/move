@@ -1,0 +1,7 @@
+#!/bin/sh
+echo
+echo "     Which did you *really* mean to type?.."
+echo
+echo mv $*
+echo more $*
+echo

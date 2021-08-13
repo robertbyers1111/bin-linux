@@ -1,0 +1,59 @@
+#!/bin/sh
+
+#-- Without cmdline arg: returns all the interesting IP Addrs on this linux host
+#-- With cmdline arg: assume it is a rigname and display its mgmt IP Addr
+
+#   +----------------------------+
+#---| Display rig's mgmt IP Addr |---
+#   +----------------------------+
+
+    if [ $# -eq 1 ]; then
+      RIGNAME=$1
+      RIGSETUP=$AUTO_HOME/setups/$RIGNAME.setup
+      if [ -f $RIGSETUP ]; then
+        MGMTIPADDR=`grep ^wancom._ip= $RIGSETUP |\
+         sed "s/wancom0.ip=//" |\
+         sed "s/[    ][  ]*# Management IP address//"`
+        echo ""
+        echo Take your pick...
+        echo ""
+        echo "     $MGMTIPADDR"
+        echo "     telnet $MGMTIPADDR"
+        echo "     ssh admin@$MGMTIPADDR"
+        echo "     ftp $MGMTIPADDR"
+        echo "     ftp $MGMTIPADDR 41"
+        echo "     sftp admin@$MGMTIPADDR"
+        echo ""
+        exit
+      fi
+    fi
+
+#   +--------------------------------------------------------------------------------+
+#---| Display all curently configured IP Addresses on this host, in a concise format |---
+#   +--------------------------------------------------------------------------------+
+
+NOW=`date +%y%m%d-%H%M%S-%N |sed 's/-\([0-9][0-9][0-9]\)[0-9]*$/-\1/g'`
+
+echo ""
+echo oO0-------------------------------------------------------------0Oo
+
+/sbin/ifconfig -a \
+ |egrep "^eth|inet.addr" \
+ |sed 's/inet addr://' \
+ |sed 's/Link encap:Ethernet  HWaddr //' \
+ > x.$NOW
+
+grep    ^e x.$NOW |grep -n . |sed 's/^\([1-9]:\)/\1 /' |sed 's/^\([1-9][0-9]:\)/\1 /' > y.$NOW
+grep -v ^e x.$NOW |grep -n . |sed 's/^\([1-9]:\)/\1 /' |sed 's/^\([1-9][0-9]:\)/\1 /' > z.$NOW
+
+join y.$NOW z.$NOW \
+ |sed 's/^[1-9][0-9]*://' \
+ |egrep "eth.:[0-9a-fA-F_][0-9a-fA-F_]" \
+ |sed 's/\(eth.:..._..\)\( ..:\)/\1 \2/' \
+ |sed 's/^\(.*\)Bcast:[1-9][0-9]*\.[1-9][0-9]*\.[1-9][0-9]*.*\(Mask:.*\)/\1 \2/' \
+ |sort -n
+
+/bin/rm x.$NOW y.$NOW z.$NOW
+
+echo oO0-------------------------------------------------------------0Oo
+echo ""

@@ -1,0 +1,20 @@
+#!/usr/bin/tclsh
+
+set COUNT 0
+foreach word [split $argv .] {
+  foreach indec $word {
+    set inhex [format %X $indec]
+    if {$COUNT == 0} {
+       set PREFIX ""
+    } else {
+      set PREFIX ":"
+    }
+    puts -nonewline "$PREFIX$inhex"
+    incr COUNT
+  }
+}
+
+if {$COUNT > 0} {
+  puts ""
+}
+

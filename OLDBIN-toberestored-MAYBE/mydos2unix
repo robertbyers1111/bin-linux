@@ -1,0 +1,119 @@
+#!/bin/sh
+
+. /home/rmbjr60/lib/rmbjr60lib.sh
+
+#   +-------+
+#---| rmTMP |---
+#   +-------+
+
+rmTMP ()
+{
+    if [ -f $TMPF ]; then
+      rm $TMPF
+      if [ -f $TMPF ]; then
+        echo WTF: $TMPF still exists!
+      fi
+    fi
+}
+
+#   +------+
+#---| MAIN |---
+#   +------+
+
+    LSFLAGS1=-lLFAGv
+    LSFLAGS2=--full-time
+
+    while [ $# -gt 0 ]; do
+
+      if [ -f $1 ]; then
+
+        echo ""
+
+        #-- Saveth the file's properties
+
+            LSBEFORE=`ls $LSFLAGS1 $LSFLAGS2 $1 \
+             | sed "s/-rw....... 1 $ALPHANUMS//" \
+             | sed "s/\.$NUM$NUM$NUM$NUM$NUM$NUM$NUM$NUM$NUM -$NUM$NUM$NUM$NUM//"`
+
+            DATESTR=`echo $LSBEFORE \
+             | sed "s/^.*$SPACES\($NUM$NUM$NUM$NUM-$NUM$NUM-$NUM$NUM $NUM$NUM:$NUM$NUM:$NUM$NUM\).*/\1/"`
+
+        #-- Renameth the target
+            mv $1 $TMPF
+
+        #-- Delete any character that is not one of:
+        #   1. A printable character
+        #   2. A tab character
+        #   3. A newline character
+
+            cat $TMPF | tr -dc '[:print:]\t\n' > $1
+
+        #-- Force the temp file to have the same timestamp
+            touch --date="$DATESTR" $1
+
+        #-- Removeth the temporary file
+            rmTMP
+
+        #-- Showeth the results
+
+            LSAFTER=`ls $LSFLAGS1 $LSFLAGS2 $1 \
+             | sed "s/-rw....... 1 $ALPHANUMS//" \
+             | sed "s/\.$NUM$NUM$NUM$NUM$NUM$NUM$NUM$NUM$NUM -$NUM$NUM$NUM$NUM//"`
+
+            echo
+            echo "     Before:  $LSBEFORE"
+            echo "     After:   $LSAFTER"
+
+      else
+        echo WTF $1 not exist!
+      fi
+
+      shift
+
+    done
+
+    echo ""
+
+#-------------------------------------------------------------------------------
+# No longer using the system dos2unix utility, as it doesn't strip out
+# all the characters I'd like it to do.
+#
+#zz#        #-- Call the system dos2unix utility (3 times)
+#zz#            dos2unix -k -o $1 $1 $1 | uniq 2>&1
+
+#-------------------------------------------------------------------------------
+# NOTE: The following was written BEFORE I knew of several features:
+#
+#   dos2unix's -k option
+#   touch's --date=STRING option
+#   ls' --full-time option
+#
+# Oh well :(
+#
+#zz#   COUNT=0
+#zz#   while [ $# -gt 0 ]
+#zz#   do
+#zz#     echo ""
+#zz#   
+#zz#     lsCMD="/bin/ls -lLAGv $1"
+#zz#     $lsCMD
+#zz#   
+#zz#     FILENAME=`$lsCMD | sed 's/.* ... .* ..:.. \(.*\)/\1/'`
+#zz#   
+#zz#     SAVETIME=`$lsCMD |\
+#zz#      sed 's/.*\( ... .. ..:.. \)/\1/' |\
+#zz#      sed 's/Jan/01/' | sed 's/Feb/02/' | sed 's/Mar/03/' | sed 's/Apr/04/' |\
+#zz#      sed 's/May/05/' | sed 's/Jun/06/' | sed 's/Jul/07/' | sed 's/Aug/08/' |\
+#zz#      sed 's/Sep/09/' | sed 's/Oct/10/' | sed 's/Nov/11/' | sed 's/Dec/12/' |\
+#zz#      sed 's/^\( .. \) /\10/' |sed 's/^ \(..\) \(..\) \(..\):\(..\) .*/\1\2\3\4/'`
+#zz#   
+#zz#     /usr/bin/dos2unix -k $FILENAME | uniq 2>&1
+#zz#   
+#zz#     #touch -t $SAVETIME $FILENAME
+#zz#   
+#zz#     $lsCMD
+#zz#   
+#zz#     shift
+#zz#     COUNT=`expr $COUNT + 1`
+#zz#   done
+#zz#   

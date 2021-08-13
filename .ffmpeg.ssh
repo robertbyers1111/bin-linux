@@ -1,0 +1,37 @@
+#!/bin/bash
+
+[ $# -eq 1 ] && FILE1="$1" || FILE1="FILE1.avi"
+FILE2=OUT_$FILE1
+
+cat <<EOF
+
+[A] Video file properties
+ 
+    ffmpeg -report -i $FILE1
+ 
+ 
+[B] Crop video
+ 
+    ffmpeg -i $FILE1 -filter:v "crop=out_w:out_h:x:y" $FILE2
+ 
+ 
+[C] Rotate video
+ 
+    ffmpeg -i $FILE1 -vf "transpose=1" $FILE2
+ 
+    0 = 90 CounterCLockwise and Vertical Flip (default) 
+    1 = 90 Clockwise 
+    2 = 90 CounterClockwise 
+    3 = 90 Clockwise and Vertical Flip
+
+[D] Extract audio without re-encoding
+
+    ffmpeg -i $FILE1 -vn -acodec copy OUT_$FILE1
+
+    -vn is no video.
+    -acodec copy says use the same audio stream that's already in there.
+
+    Check the output to see what codec it uses, then rename the file accordingly.
+
+EOF
+

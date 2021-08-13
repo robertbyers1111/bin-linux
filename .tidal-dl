@@ -1,0 +1,3 @@
+#!/bin/bash
+cd /media/rmbjr60/Silver_Blue_2T/BKUPS/MrKitesS8/Card/Music
+rlwrap tidal-dl
