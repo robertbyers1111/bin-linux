@@ -15,8 +15,17 @@ doit()
             NOW=`date +%s%N`
             SAVEME="$BKUP_DIR/$BASEFN.${MODTIME}_${NOW}"
             cp -ip "$1" "$SAVEME"
-            sha256sum "$1"
-            sha256sum "$SAVEME"
+
+
+            echo
+            /bin/ls --time-style="+%Y-%m-%d %H:%M:%S" --group-directories-first -ltLFANGv "$BKUP_DIR/${BASEFN}.20"* | tail -8
+
+            echo
+            CHECKFILES=`/bin/ls -1tr "$BKUP_DIR/${BASEFN}.20"* | tail -8`
+            for CHECKFILE in $CHECKFILES $1
+            do
+                sha256sum "$CHECKFILE"
+            done
         } || {
             echo $1 is not readable
             /bin/ls -l "$1"
