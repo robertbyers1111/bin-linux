@@ -37,36 +37,59 @@ do_remove_crap ()
         touch -t $ORIGTIME_FMTB "$1"
         echo `do_getsize "$1"` "$1"
     }
+    [ -f $TMPN ] && rm $TMPN
+}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+do_each_file_from_command_line()
+{
+    FILEN="$1"
+    
+    [ ! -f "$FILEN" ] && {
+        [ -d "$FILEN" ] && {
+            echo
+            echo "ERROR: $FILEN is a directory (i.e., is not a file)"
+            exit
+        } || {
+            echo
+            echo "ERROR: $FILEN is not a regular file"
+            exit
+        }
+    }
+    
+    do_ls "$FILEN"
+    
+    PREVSZ=-1
+    CURRSZ=`do_getsize "$FILEN"`
+    echo $CURRSZ $FILEN
+    while [ $CURRSZ -ne $PREVSZ ]
+    do
+        do_dos2unix "$FILEN"
+        PREVSZ=$CURRSZ
+        CURRSZ=`do_getsize "$FILEN"`
+        [ $CURRSZ -ne $PREVSZ ] && echo $CURRSZ $FILEN
+    done
+    
+    do_remove_crap "$FILEN"
+    do_ls "$FILEN"
 }
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # * * *  M A I N  * * *
 
-[ $# -ne 1 ] && { 
+[ $# -lt 1 ] && { 
     echo
-    echo USAGE: `basename $0` file
+    echo USAGE: `basename $0` file...
     exit
 }
 
-FILEN="$1"
-
-[ ! -f "$FILEN" ] && {
-    echo
-    echo ERROR: ENOEXIST $FILEN
-    exit
-}
-
-do_ls "$FILEN"
-
-PREVSZ=-1
-CURRSZ=`do_getsize "$FILEN"`
-echo $CURRSZ $FILEN
-while [ $CURRSZ -ne $PREVSZ ]
+FIRST=""
+while [ $# -gt 0 ]
 do
-    do_dos2unix "$FILEN"
-    PREVSZ=$CURRSZ
-    CURRSZ=`do_getsize "$FILEN"`
-    [ $CURRSZ -ne $PREVSZ ] && echo $CURRSZ $FILEN
+    $FIRST
+    do_each_file_from_command_line "$1"
+    FIRST=echo
+    shift
 done
 
 do_remove_crap "$FILEN"
