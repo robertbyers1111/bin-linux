@@ -88,9 +88,9 @@ while [ $# -gt 0 ]
 do
     $FIRST
     do_each_file_from_command_line "$1"
+    do_remove_crap "$1"
+    do_ls "$1"
+
     FIRST=echo
     shift
 done
-
-do_remove_crap "$FILEN"
-do_ls "$FILEN"
