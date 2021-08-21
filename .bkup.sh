@@ -24,7 +24,7 @@ doit()
             CHECKFILES=`/bin/ls -1tr "$BKUP_DIR/${BASEFN}.20"* | tail -8`
             for CHECKFILE in $CHECKFILES $1
             do
-                sha256sum "$CHECKFILE"
+                sha256sum "$CHECKFILE" | sed 's/.home.rbyers//'
             done
         } || {
             echo $1 is not readable
