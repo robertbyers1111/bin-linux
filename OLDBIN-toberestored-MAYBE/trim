@@ -1,5 +1,0 @@
-#!/usr/bin/tclsh
-while {![eof stdin]} {
-  gets stdin a
-  puts [string trim $a]
-}

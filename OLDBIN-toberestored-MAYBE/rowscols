@@ -1,6 +1,0 @@
-#!/bin/sh
-
-alias rows='stty -a | head -1 | sed '\''s/.*; rows  *\([0-9][0-9]*\);  *columns.*/\1/'\'''
-
-alias cols='stty -a |head -1 |sed '\''s/.*columns \([0-9][0-9]*\).*/\1/'\'''
-
