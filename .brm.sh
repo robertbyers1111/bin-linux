@@ -1,7 +1,7 @@
 #!/bin/bash
 
-NOW=`date +%y%m%d_%H%M%S`
-NOWSECSHEX=`date +10i16o%sp%Np | dc | sed ':a;N;$!ba;s/\n/./g'`
+NOW=`date +%Y-%m%d-%H%M%S.%3N`
+#NOWSECSHEX=`date +10i16o%sp%Np | dc | sed ':a;N;$!ba;s/\n/./g'`
 TRASH=$HOME/.trash
 SPACE=""
 OPTS=""
@@ -41,7 +41,7 @@ while [ $# -gt 0 ]; do
          else
             MODTIME_EPOCH=`stat -c %Y "$FILE"`
             MODTIME=`date -d @$MODTIME_EPOCH +%Y-%m%d-%H%M%S`
-            mv "$FILE" "$TRASH/$BASENAME.MODIFIED-$MODTIME.TRASHED-$NOWSECSHEX"
+            mv "$FILE" "$TRASH/$BASENAME.MODIFIED-$MODTIME.TRASHED-$NOW"
          fi
        fi
   esac
