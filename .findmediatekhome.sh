@@ -1,8 +1,30 @@
 #!/bin/bash
 
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # This script is for starting from user's $HOME
+        #
+        # Another script should be written for '/' as the starting point
+        #
+        # ..or make this script smart enough to do both?
+        #
+        # Either way, some of the exclusions for a '/' traversal would be..
+        #
+        #    -path /cdrom -prune -o \
+        #    -path /dev -prune -o \
+        #    -path /lost+found -prune -o \
+        #    -path /media -prune -o \
+        #    -path /mount -prune -o \
+        #    -path /proc -prune -o \
+        #    -path /timeshift -prune -o \
+        #    -path /var/run -prune -o \
+        #
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # This script runs 'find' for a user's home directory, with certain crucial
 # exceptions for performance reasons (e.g., exclude ~/.snapshot, ~/.cache, etc.
+#
+# A case statement is used to customize the exclusions based on current hostname.
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # variable: TO_EXCLUDE
@@ -16,14 +38,33 @@
 # is not set up allow deeper directories to be excluded. (that is a TODO item)
 #
 # This variable is used as a match pattern in a bash case statement, and must
-# adhere to the case match pattern syntax. However, it should not include the
-# trailing right parenthesis. Further, I found it won't work without enclosing
-# the pattern in parenthesis *and* preceeding the entire string with a '+'.
+# adhere to a bash case statement's match pattern syntax. However, it should not
+# include the trailing right parenthesis. Further, I found it won't work without
+# enclosing the pattern in parenthesis *and* preceeding the entire string with a '+'.
+#
+# Example..
+#
+#         TO_EXCLUDE="+(this|that)"
+#
+# ..will result in the following case statement...
+#
+#         case $XXX in
+#             +(this|that)) echo Found this or that ;;
+#         esac
+#
+# ..yes, there are *two* right parentheses and only one left parenthesis. But
+# the variable TO_EXCLUDE will have only one of each.
 #
 # (also, extglob is required for this to work)
 
     shopt -s extglob
-    TO_EXCLUDE="+(.|..|./.cache|./.snapshot|./nfs*|./.dbus|./.gconf|./.kde|./.vim|./.eclipse)"
+
+    case $HOSTNAME in
+        RB-EL*) TO_EXCLUDE="+(.|..|./.cache|./.snapshot|./nfs*|./.dbus|./.gconf|./.kde|./.vim|./.eclipse)" 
+        ;;
+        *) TO_EXCLUDE="+(.|..|./.cache|./.snapshot|./nfs*|./.dbus|./.gconf|./.kde|./.vim)" 
+        ;;
+    esac
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # assemble_dirs()
