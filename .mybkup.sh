@@ -32,6 +32,7 @@ case `hostname` in
          .inputrc \
          .profile \
          .promptrc \
+         .screenrc \
          .toprc \
          .vimrc \
          .vimrc_rbyers \
@@ -53,6 +54,7 @@ case `hostname` in
          .login \
          .login.user \
          .promptrc \
+         .screenrc \
          .toprc \
          .vimrc \
          .vimrc_rbyers \
