@@ -5,6 +5,9 @@
 
 doit()
 {
+    echo
+    echo "    % git log --pretty=format:'%ai  %<(14,trunc)%an  %h  %<|(155,trunc)%s' -32 $1 $*"
+    echo
     git log --pretty=format:'%ai  %<(14,trunc)%an  %h  %<|(155,trunc)%s' -32 $1 $*
 }
 
