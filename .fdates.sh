@@ -14,7 +14,7 @@ doit()
     MODIFIED=`stat -c %y "$1"`
     ACCESS=`stat -c %x "$1"`
     STATUS=`stat -c %z "$1"`
-    [ ! _$CREATED = "_-" ] && echo "      CREATED: $CREATED (stat -c %w)"
+    [ ! "$CREATED" = "-" ] && echo "      CREATED: $CREATED (stat -c %w)"
     echo "   MODIFIED: $MODIFIED (stat -c %y)"
     echo "     ACCESS: $ACCESS (stat -c %x)"
     echo "     STATUS: $STATUS (stat -c %z)"
