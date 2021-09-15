@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+# does 'l <your stuff here> | .commify'
+#
+# I couldn't make this work as a bash function, so I am making a full-blown script
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[ "$BBBIN" = "" ] && {
+    [ "$HOME" != "" ] && {
+        BBBIN="${HOME}/bin"
+        echo abc $HOME BBBIN: $BBBIN
+    } || {
+        [ "$LOGNAME" != "" ] && {
+            BBBIN="~${LOGNAME}/bin"
+            echo def $LOGNAME BBBIN: $BBBIN
+        } || {
+            [ "$USER" != "" ] && {
+                BBBIN="~${USER}/bin"
+                echo xyz $USER BBBIN: $BBBIN
+            }
+        }
+    }
+}
+
+[ "$BBBIN" = "" ] && {
+    echo FAILURE: Cannot locate user home directory
+    exit -1
+}
+
+[ ! -d "${BBBIN}/" ] && {
+    echo FAILURE: ${BBBIN}/ either does not exist or is not a directory
+    exit -1
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+doit ()
+{
+    /bin/ls --time-style="+%Y-%m-%d %T" --group-directories-first -lLFANGv -Sr $*
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+doit $* | $BBBIN/commify | awk '{printf "%s %s %s %14s %s %s %s\n", $1, $2, $3, $4, $5, $6, $7}'
